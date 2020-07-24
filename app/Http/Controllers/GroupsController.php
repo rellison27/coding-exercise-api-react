@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Log;
-use App\Http\Resources\GroupsCollection;
 use App\Http\Resources\GroupResource;
+use App\Http\Resources\GroupsCollection;
 use App\Models\Group;
+use Illuminate\Http\Request;
 
 // Step 2:
-// This endpoint should support 
+// This endpoint should support
 // CRUD (Create, Read, Update, Delete) operations.
 //Step 2.5 Test that the endpoint works
 class GroupsController extends Controller
@@ -42,9 +40,9 @@ class GroupsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {        
+    {
         $request->validate([
-            'group_name'    => 'required|max:255',
+            'group_name' => 'required|max:255',
         ]);
 
         $group = Group::create($request->all());
@@ -103,5 +101,17 @@ class GroupsController extends Controller
         $group->delete();
 
         return response()->json(null, 204);
+    }
+
+    // Import bulk from CSV
+    public function handleImportGroups(Request $request)
+    {
+        $rows = $request->all();
+        foreach ($rows as $row) {
+            $group = Group::create($row);
+            // error_log($group);
+            new GroupResource($group);
+        }
+
     }
 }
