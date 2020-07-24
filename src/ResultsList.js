@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Table } from 'semantic-ui-react'
+import CSVReader from "react-csv-reader";
 
 class ResultsList extends Component {
     constructor(props) {
@@ -15,8 +16,25 @@ class ResultsList extends Component {
 
     render() {
         var data = this.state.data || [];
+        const handleForce = (data, fileInfo) => console.log(data, fileInfo);
 
+        const papaparseOptions = {
+          header: true,
+          dynamicTyping: true,
+          skipEmptyLines: true,
+          transformHeader: header => header.toLowerCase().replace(/\W/g, "_")
+        };
+        // Step 3
+        // Update the ReactJS application to 
+        // receive an uploaded People & Group CSV file
         return (
+          <>
+          <CSVReader
+      cssClass="react-csv-input"
+      label="Select CSV with Groups or People"
+      onFileLoaded={handleForce}
+      parserOptions={papaparseOptions}
+    />
             <Table celled padded>
               <Table.Header>
                 <Table.Row>
@@ -44,6 +62,7 @@ class ResultsList extends Component {
 
               </Table.Body>
             </Table>
+            </>
     );
 }
 
