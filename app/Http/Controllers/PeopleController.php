@@ -18,6 +18,7 @@ class PeopleController extends Controller
      */
     public function index()
     {
+        //The read to get all /api/people
         return new PeopleCollection(Person::all());
     }
 
@@ -37,6 +38,7 @@ class PeopleController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    // post for /api/people
     public function store(Request $request)
     {
         $request->validate([
@@ -59,6 +61,8 @@ class PeopleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+    // Get for specified person
     public function show($id)
     {
         return new PersonResource(Person::findOrFail($id));
@@ -70,6 +74,8 @@ class PeopleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+    // this looks like an update/PUT 
     public function edit($id)
     {
         //
@@ -82,6 +88,7 @@ class PeopleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    //PUT for specified user
     public function update(Request $request, $id)
     {
         $person = Person::findOrFail($id);
@@ -96,6 +103,8 @@ class PeopleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+     // DELETE speicified user 
     public function destroy($id)
     {
         $person = Person::findOrFail($id);
@@ -103,4 +112,9 @@ class PeopleController extends Controller
 
         return response()->json(null, 204);
     }
+
+    // Step 4
+    // create function that creates 
+    // Multiple users or updates users 
+    // from React CSV form 
 }
