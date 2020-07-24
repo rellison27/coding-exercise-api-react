@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-
 use App\Http\Resources\PeopleCollection;
 use App\Http\Resources\PersonResource;
 use App\Models\Person;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PeopleController extends Controller
 {
@@ -42,10 +41,10 @@ class PeopleController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'first_name'    => 'required|max:255',
-            'last_name'     => 'required|max:255',
+            'first_name' => 'required|max:255',
+            'last_name' => 'required|max:255',
             'email_address' => 'required|email',
-            'status'        => Rule::in(['active', 'archived'])
+            'status' => Rule::in(['active', 'archived']),
         ]);
 
         $person = Person::create($request->all());
@@ -75,7 +74,7 @@ class PeopleController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    // this looks like an update/PUT 
+    // this looks like an update/PUT
     public function edit($id)
     {
         //
@@ -104,7 +103,7 @@ class PeopleController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-     // DELETE speicified user 
+    // DELETE speicified user
     public function destroy($id)
     {
         $person = Person::findOrFail($id);
@@ -114,7 +113,17 @@ class PeopleController extends Controller
     }
 
     // Step 4
-    // create function that creates 
-    // Multiple users or updates users 
-    // from React CSV form 
+    // create function that creates
+    // Multiple users or updates users
+    // from React CSV form
+    public function handleImportPeople(Request $request)
+    {
+        $rows = $request->all();
+        foreach ($rows as $row) {
+            $person = Person::create($row);
+            // error_log($group);
+            new PersonResource($person);
+        }
+
+    }
 }

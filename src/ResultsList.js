@@ -15,7 +15,7 @@ class ResultsList extends Component {
     }
 
     render() {
-        const postData = (data) => {
+        const postGroups = (data) => {
             fetch("http://localhost:8000/api/import/groups", {
                 method: "POST",
                 headers: {
@@ -24,9 +24,18 @@ class ResultsList extends Component {
                 body: JSON.stringify(data),
             });
         };
+        const postPeople = (data) => {
+            fetch("http://localhost:8000/api/import/people", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+        };
         var data = this.state.data || [];
-        const handleForce = (data, fileInfo) => postData(data); //console.log(data, fileInfo);
-
+        const handleGroups = (data, fileInfo) => postGroups(data); //console.log(data, fileInfo);
+        const handlePeople = (data, fileInfo) => postPeople(data);
         const papaparseOptions = {
             header: true,
             dynamicTyping: true,
@@ -40,8 +49,8 @@ class ResultsList extends Component {
             <>
                 <CSVReader
                     cssClass="react-csv-input"
-                    label="Select CSV with Groups or People"
-                    onFileLoaded={handleForce}
+                    label="Select CSV for People"
+                    onFileLoaded={handlePeople}
                     parserOptions={papaparseOptions}
                 />
                 <Table celled padded>
@@ -77,6 +86,12 @@ class ResultsList extends Component {
                         })}
                     </Table.Body>
                 </Table>
+                <CSVReader
+                    cssClass="react-csv-input"
+                    label="Select CSV for Groups"
+                    onFileLoaded={handleGroups}
+                    parserOptions={papaparseOptions}
+                />
             </>
         );
     }
