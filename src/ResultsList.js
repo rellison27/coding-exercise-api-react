@@ -1,19 +1,41 @@
 import React, { Component } from "react";
 import { Table } from "semantic-ui-react";
 import CSVReader from "react-csv-reader";
-
+import _ from "lodash";
 class ResultsList extends Component {
     constructor(props) {
         super(props);
-        this.state = { data: [] };
+        this.state = {
+            peopleData: [],
+            groupData: [],
+            column: null,
+            direction: null,
+        };
     }
+    handleSort = (clickedColumn) => () => {
+        const { column, peopleData, direction } = this.state;
+
+        if (column !== clickedColumn) {
+            this.setState({
+                column: clickedColumn,
+                peopleData: _.sortBy(peopleData, [clickedColumn]),
+                direction: "ascending",
+            });
+
+            return;
+        }
+
+        this.setState({
+            peopleData: peopleData.reverse(),
+            direction: direction === "ascending" ? "descending" : "ascending",
+        });
+    };
 
     componentDidMount() {
         fetch("http://localhost:8000/api/people")
             .then((response) => response.json())
-            .then((data) => this.setState({ data: data.data }));
+            .then((data) => this.setState({ peopleData: data.data }));
     }
-
     render() {
         const postGroups = (data) => {
             fetch("http://localhost:8000/api/import/groups", {
@@ -33,7 +55,7 @@ class ResultsList extends Component {
                 body: JSON.stringify(data),
             });
         };
-        var data = this.state.data || [];
+        var data = this.state.peopleData || [];
         const handleGroups = (data, fileInfo) => postGroups(data); //console.log(data, fileInfo);
         const handlePeople = (data, fileInfo) => postPeople(data);
         const papaparseOptions = {
@@ -42,6 +64,7 @@ class ResultsList extends Component {
             skipEmptyLines: true,
             transformHeader: (header) => header.toLowerCase(),
         };
+        const { column, direction } = this.state;
         // Step 3
         // Update the ReactJS application to
         // receive an uploaded People & Group CSV file
@@ -53,37 +76,74 @@ class ResultsList extends Component {
                     onFileLoaded={handlePeople}
                     parserOptions={papaparseOptions}
                 />
-                <Table celled padded>
+                <Table celled padded sortable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell singleLine>
+                            <Table.HeaderCell
+                                singleLine
+                                sorted={
+                                    column === "first_name" ? direction : null
+                                }
+                                onClick={this.handleSort("first_name")}
+                            >
                                 First Name
                             </Table.HeaderCell>
-                            <Table.HeaderCell>Last Name</Table.HeaderCell>
-                            <Table.HeaderCell>Email</Table.HeaderCell>
-                            <Table.HeaderCell>Status</Table.HeaderCell>
+                            <Table.HeaderCell
+                                sorted={
+                                    column === "last_name" ? direction : null
+                                }
+                                onClick={this.handleSort("last_name")}
+                            >
+                                Last Name
+                            </Table.HeaderCell>
+                            <Table.HeaderCell
+                                sorted={
+                                    column === "email_address"
+                                        ? direction
+                                        : null
+                                }
+                                onClick={this.handleSort("email_address")}
+                            >
+                                Email
+                            </Table.HeaderCell>
+                            <Table.HeaderCell
+                                sorted={column === "status" ? direction : null}
+                                onClick={this.handleSort("status")}
+                            >
+                                Status
+                            </Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
 
                     <Table.Body>
-                        {data.map((person, index) => {
-                            return (
-                                <Table.Row key={index}>
-                                    <Table.Cell singleLine>
-                                        {person.first_name}
-                                    </Table.Cell>
-                                    <Table.Cell singleLine>
-                                        {person.last_name}
-                                    </Table.Cell>
-                                    <Table.Cell singleLine>
-                                        {person.email_address}
-                                    </Table.Cell>
-                                    <Table.Cell singleLine>
-                                        {person.status}
-                                    </Table.Cell>
-                                </Table.Row>
-                            );
-                        })}
+                        {data.map(
+                            (
+                                {
+                                    first_name,
+                                    last_name,
+                                    email_address,
+                                    status,
+                                },
+                                index
+                            ) => {
+                                return (
+                                    <Table.Row key={index}>
+                                        <Table.Cell singleLine>
+                                            {first_name}
+                                        </Table.Cell>
+                                        <Table.Cell singleLine>
+                                            {last_name}
+                                        </Table.Cell>
+                                        <Table.Cell singleLine>
+                                            {email_address}
+                                        </Table.Cell>
+                                        <Table.Cell singleLine>
+                                            {status}
+                                        </Table.Cell>
+                                    </Table.Row>
+                                );
+                            }
+                        )}
                     </Table.Body>
                 </Table>
                 <CSVReader
