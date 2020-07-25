@@ -6,6 +6,7 @@ use App\Http\Resources\GroupResource;
 use App\Http\Resources\GroupsCollection;
 use App\Models\Group;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 // Step 2:
 // This endpoint should support
@@ -46,7 +47,6 @@ class GroupsController extends Controller
         ]);
 
         $group = Group::create($request->all());
-        // error_log($group);
         return (new GroupResource($group))
             ->response()
             ->setStatusCode(201);
@@ -106,12 +106,25 @@ class GroupsController extends Controller
     // Import bulk from CSV
     public function handleImportGroups(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            '*.group_name' => 'required|max:255',
+        ]);
+        // on fail return error message
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors(),
+                'message' => 'Name of group is required',
+            ], 422);
+        };
         $rows = $request->all();
         foreach ($rows as $row) {
             $group = Group::create($row);
-            // error_log($group);
             new GroupResource($group);
         }
+        return response()->json([
+            'data' => $request->all(),
+            'message' => "Groups successfully imported!",
+        ], 200);
 
     }
 }
