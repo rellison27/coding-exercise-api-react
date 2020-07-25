@@ -6,6 +6,7 @@ use App\Http\Resources\PeopleCollection;
 use App\Http\Resources\PersonResource;
 use App\Models\Person;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class PeopleController extends Controller
@@ -118,12 +119,29 @@ class PeopleController extends Controller
     // from React CSV form
     public function handleImportPeople(Request $request)
     {
+        // Validate fields
+        $validator = Validator::make($request->all(), [
+            '*.first_name' => 'required|max:255',
+            '*.last_name' => 'required|max:255',
+            '*.email_address' => 'required|email',
+            '*.status' => Rule::in(['active', 'archived']),
+        ]);
+        // on fail return error message
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors(),
+                'message' => 'all fields are required, please make sure all fields have the correct values',
+            ], 422);
+        };
         $rows = $request->all();
         foreach ($rows as $row) {
             $person = Person::create($row);
-            // error_log($group);
             new PersonResource($person);
         }
+        return response()->json([
+            'data' => $request->all(),
+            'message' => "People successfully imported!",
+        ], 200);
 
     }
 }
