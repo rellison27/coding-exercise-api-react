@@ -58,13 +58,14 @@ class ResultsList extends Component {
             });
         };
         var data = this.state.peopleData || [];
-        const handleGroups = (data, fileInfo) => postGroups(data); //console.log(data, fileInfo);
+        const handleGroups = (data, fileInfo) => postGroups(data);
         const handlePeople = (data, fileInfo) => postPeople(data);
         const papaparseOptions = {
             header: true,
             dynamicTyping: true,
             skipEmptyLines: true,
-            transformHeader: (header) => header.toLowerCase(),
+            transformHeader: (header) =>
+                header.toLowerCase().replace(/\W/g, "_"),
         };
         const { column, direction } = this.state;
         // Step 3
