@@ -47,6 +47,8 @@ class ResultsList extends Component {
             });
         };
         const postPeople = (data) => {
+            const { peopleData } = this.state;
+            this.setState({ peopleData: [...peopleData, ...data] });
             fetch("http://localhost:8000/api/import/people", {
                 method: "POST",
                 headers: {
@@ -112,6 +114,14 @@ class ResultsList extends Component {
                             >
                                 Status
                             </Table.HeaderCell>
+                            <Table.HeaderCell
+                                sorted={
+                                    column === "group_name" ? direction : null
+                                }
+                                onClick={this.handleSort("grou_name")}
+                            >
+                                Group
+                            </Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
 
@@ -123,6 +133,7 @@ class ResultsList extends Component {
                                     last_name,
                                     email_address,
                                     status,
+                                    group_name,
                                 },
                                 index
                             ) => {
@@ -139,6 +150,9 @@ class ResultsList extends Component {
                                         </Table.Cell>
                                         <Table.Cell singleLine>
                                             {status}
+                                        </Table.Cell>
+                                        <Table.Cell singleLine>
+                                            {group_name}
                                         </Table.Cell>
                                     </Table.Row>
                                 );
