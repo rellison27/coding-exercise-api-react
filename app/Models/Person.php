@@ -10,6 +10,11 @@ class Person extends Model
         'first_name',
         'last_name',
         'email_address',
-        'status'
+        'status',
+        'group_name',
+    ];
+
+    protected $attributes = [
+        'group_name' => 'Member',
     ];
 }
