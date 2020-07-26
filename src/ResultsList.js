@@ -62,8 +62,11 @@ class ResultsList extends Component {
                 body: JSON.stringify(data),
             });
         };
-        const handleGroups = (data, fileInfo) => postGroups(data);
-        const handlePeople = (data, fileInfo) => postPeople(data);
+        const handleUpload = (data, fileInfo) => {
+            Object.keys(data[0]).find((element) => element === "first_name")
+                ? postPeople(data)
+                : postGroups(data);
+        };
         const papaparseOptions = {
             header: true,
             dynamicTyping: true,
@@ -77,10 +80,10 @@ class ResultsList extends Component {
         // receive an uploaded People & Group CSV file
         return (
             <>
+                <div>Upload a .CSV file for your Groups and/or People</div>
                 <CSVReader
                     cssClass="react-csv-input"
-                    label="Select CSV for People"
-                    onFileLoaded={handlePeople}
+                    onFileLoaded={handleUpload}
                     parserOptions={papaparseOptions}
                 />
                 <h1> People</h1>
@@ -167,12 +170,6 @@ class ResultsList extends Component {
                             )}
                     </Table.Body>
                 </Table>
-                <CSVReader
-                    cssClass="react-csv-input"
-                    label="Select CSV for Groups"
-                    onFileLoaded={handleGroups}
-                    parserOptions={papaparseOptions}
-                />
                 <h1>Groups</h1>
                 {groupData &&
                     groupData.map(({ group_name }, index) => (
