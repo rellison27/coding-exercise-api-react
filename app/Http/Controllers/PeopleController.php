@@ -135,8 +135,14 @@ class PeopleController extends Controller
         };
         $rows = $request->all();
         foreach ($rows as $row) {
-            $person = Person::create($row);
-            new PersonResource($person);
+            if (array_key_exists('id', $row) && Person::find($row['id']) !== null) {
+                $person = Person::findOrFail($row['id']);
+                $person->update($row);
+            } else {
+                $person = Person::create($row);
+                new PersonResource($person);
+            }
+
         }
         return response()->json([
             'data' => $request->all(),
