@@ -118,8 +118,14 @@ class GroupsController extends Controller
         };
         $rows = $request->all();
         foreach ($rows as $row) {
-            $group = Group::create($row);
-            new GroupResource($group);
+            if (array_key_exists('id', $row) && Group::find($row['id']) !== null) {
+                $group = Group::findOrFail($row['id']);
+                $group->update($row);
+            } else {
+                $group = Group::create($row);
+                new GroupResource($group);
+            }
+
         }
         return response()->json([
             'data' => $request->all(),
