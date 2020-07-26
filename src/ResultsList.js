@@ -35,9 +35,14 @@ class ResultsList extends Component {
         fetch("http://localhost:8000/api/people")
             .then((response) => response.json())
             .then((data) => this.setState({ peopleData: data.data }));
+        fetch("http://localhost:8000/api/groups")
+            .then((response) => response.json())
+            .then((data) => this.setState({ groupData: data.data }));
     }
     render() {
         const postGroups = (data) => {
+            const { groupData } = this.state;
+            this.setState({ groupData: [...groupData, ...data] });
             fetch("http://localhost:8000/api/import/groups", {
                 method: "POST",
                 headers: {
@@ -57,7 +62,6 @@ class ResultsList extends Component {
                 body: JSON.stringify(data),
             });
         };
-        var data = this.state.peopleData || [];
         const handleGroups = (data, fileInfo) => postGroups(data);
         const handlePeople = (data, fileInfo) => postPeople(data);
         const papaparseOptions = {
@@ -67,7 +71,7 @@ class ResultsList extends Component {
             transformHeader: (header) =>
                 header.toLowerCase().replace(/\W/g, "_"),
         };
-        const { column, direction } = this.state;
+        const { column, direction, groupData, peopleData } = this.state;
         // Step 3
         // Update the ReactJS application to
         // receive an uploaded People & Group CSV file
@@ -79,6 +83,7 @@ class ResultsList extends Component {
                     onFileLoaded={handlePeople}
                     parserOptions={papaparseOptions}
                 />
+                <h1> People</h1>
                 <Table celled padded sortable>
                     <Table.Header>
                         <Table.Row>
@@ -119,7 +124,7 @@ class ResultsList extends Component {
                                 sorted={
                                     column === "group_name" ? direction : null
                                 }
-                                onClick={this.handleSort("grou_name")}
+                                onClick={this.handleSort("group_name")}
                             >
                                 Group
                             </Table.HeaderCell>
@@ -127,38 +132,39 @@ class ResultsList extends Component {
                     </Table.Header>
 
                     <Table.Body>
-                        {data.map(
-                            (
-                                {
-                                    first_name,
-                                    last_name,
-                                    email_address,
-                                    status,
-                                    group_name,
-                                },
-                                index
-                            ) => {
-                                return (
-                                    <Table.Row key={index}>
-                                        <Table.Cell singleLine>
-                                            {first_name}
-                                        </Table.Cell>
-                                        <Table.Cell singleLine>
-                                            {last_name}
-                                        </Table.Cell>
-                                        <Table.Cell singleLine>
-                                            {email_address}
-                                        </Table.Cell>
-                                        <Table.Cell singleLine>
-                                            {status}
-                                        </Table.Cell>
-                                        <Table.Cell singleLine>
-                                            {group_name}
-                                        </Table.Cell>
-                                    </Table.Row>
-                                );
-                            }
-                        )}
+                        {peopleData &&
+                            peopleData.map(
+                                (
+                                    {
+                                        first_name,
+                                        last_name,
+                                        email_address,
+                                        status,
+                                        group_name,
+                                    },
+                                    index
+                                ) => {
+                                    return (
+                                        <Table.Row key={index}>
+                                            <Table.Cell singleLine>
+                                                {first_name}
+                                            </Table.Cell>
+                                            <Table.Cell singleLine>
+                                                {last_name}
+                                            </Table.Cell>
+                                            <Table.Cell singleLine>
+                                                {email_address}
+                                            </Table.Cell>
+                                            <Table.Cell singleLine>
+                                                {status}
+                                            </Table.Cell>
+                                            <Table.Cell singleLine>
+                                                {group_name}
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    );
+                                }
+                            )}
                     </Table.Body>
                 </Table>
                 <CSVReader
@@ -167,6 +173,42 @@ class ResultsList extends Component {
                     onFileLoaded={handleGroups}
                     parserOptions={papaparseOptions}
                 />
+                <h1>Groups</h1>
+                {groupData &&
+                    groupData.map(({ group_name }, index) => (
+                        <Table celled padded sortable key={index}>
+                            <Table.Header>
+                                <Table.Row>
+                                    <Table.HeaderCell
+                                        sorted={
+                                            column === group_name
+                                                ? direction
+                                                : null
+                                        }
+                                        onClick={this.handleSort(group_name)}
+                                    >
+                                        {group_name}
+                                    </Table.HeaderCell>
+                                </Table.Row>
+                            </Table.Header>
+
+                            <Table.Body>
+                                {_.filter(peopleData, {
+                                    group_name: group_name,
+                                    status: "active",
+                                }).map((member, index) => {
+                                    console.log(member.length);
+                                    return (
+                                        <Table.Row key={index}>
+                                            <Table.Cell singleLine>
+                                                {member.first_name}
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    );
+                                })}
+                            </Table.Body>
+                        </Table>
+                    ))}
             </>
         );
     }
