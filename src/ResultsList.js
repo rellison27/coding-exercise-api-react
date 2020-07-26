@@ -6,28 +6,89 @@ class ResultsList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            peopleData: [],
-            groupData: [],
+            peopleData: [
+                {
+                    first_name: "Vaughn",
+                    last_name: "Hellison",
+                    status: "active",
+                    group_name: "Member",
+                },
+                {
+                    first_name: "John",
+                    last_name: "Dellison",
+                    status: "active",
+                    group_name: "Elder",
+                },
+                {
+                    first_name: "Shaun",
+                    last_name: "Ellison",
+                    status: "active",
+                    group_name: "Member",
+                },
+
+                {
+                    first_name: "Gon",
+                    last_name: "Gellison",
+                    status: "active",
+                    group_name: "Elder",
+                },
+            ],
+            groupData: [{ group_name: "Member" }, { group_name: "Elder" }],
             column: null,
             direction: null,
+            members: [],
         };
     }
     handleSort = (clickedColumn) => () => {
-        const { column, peopleData, direction } = this.state;
-
+        const { column, peopleData, direction, members } = this.state;
+        let membersCopy = [...members];
+        let arrToEdit = membersCopy.splice(clickedColumn, 1);
         if (column !== clickedColumn) {
-            this.setState({
-                column: clickedColumn,
-                peopleData: _.sortBy(peopleData, [clickedColumn]),
-                direction: "ascending",
-            });
+            if (Number.isInteger(clickedColumn)) {
+                let sortedArr = _.sortBy(...arrToEdit, ["first_name"]);
+                membersCopy.splice(clickedColumn, 0, sortedArr);
+                this.setState({
+                    column: clickedColumn,
+                    members: [...membersCopy],
+                    direction: "ascending",
+                });
+            } else {
+                this.setState({
+                    column: clickedColumn,
+                    peopleData: _.sortBy(peopleData, [clickedColumn]),
+                    direction: "ascending",
+                });
+            }
 
             return;
         }
+        if (Number.isInteger(clickedColumn)) {
+            let reversedArr = _.reverse(...arrToEdit);
+            membersCopy.splice(clickedColumn, 0, reversedArr);
+            this.setState({
+                members: [...membersCopy],
+                direction:
+                    direction === "ascending" ? "descending" : "ascending",
+            });
+        } else {
+            this.setState({
+                peopleData: peopleData.reverse(),
+                direction:
+                    direction === "ascending" ? "descending" : "ascending",
+            });
+        }
+        return;
+    };
 
+    createMembersArr = () => {
+        const { peopleData, groupData } = this.state;
         this.setState({
-            peopleData: peopleData.reverse(),
-            direction: direction === "ascending" ? "descending" : "ascending",
+            members: groupData.map(({ group_name }) =>
+                _.filter(peopleData, {
+                    group_name: group_name,
+                    status: "active",
+                })
+            ),
         });
     };
 
@@ -38,7 +99,18 @@ class ResultsList extends Component {
         fetch("http://localhost:8000/api/groups")
             .then((response) => response.json())
             .then((data) => this.setState({ groupData: data.data }));
+        this.createMembersArr();
     }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (
+            this.state.peopleData.length !== prevState.peopleData.length ||
+            this.state.groupData.length !== prevState.groupData.length
+        ) {
+            this.createMembersArr();
+        }
+    }
+
     render() {
         const postGroups = (data) => {
             const { groupData } = this.state;
@@ -74,7 +146,13 @@ class ResultsList extends Component {
             transformHeader: (header) =>
                 header.toLowerCase().replace(/\W/g, "_"),
         };
-        const { column, direction, groupData, peopleData } = this.state;
+        const {
+            column,
+            direction,
+            groupData,
+            peopleData,
+            members,
+        } = this.state;
         // Step 3
         // Update the ReactJS application to
         // receive an uploaded People & Group CSV file
@@ -178,11 +256,9 @@ class ResultsList extends Component {
                                 <Table.Row>
                                     <Table.HeaderCell
                                         sorted={
-                                            column === group_name
-                                                ? direction
-                                                : null
+                                            column === index ? direction : null
                                         }
-                                        onClick={this.handleSort(group_name)}
+                                        onClick={this.handleSort(index)}
                                     >
                                         {group_name}
                                     </Table.HeaderCell>
@@ -190,15 +266,14 @@ class ResultsList extends Component {
                             </Table.Header>
 
                             <Table.Body>
-                                {_.filter(peopleData, {
+                                {_.filter(members[index], {
                                     group_name: group_name,
                                     status: "active",
-                                }).map((member, index) => {
-                                    console.log(member.length);
+                                }).map(({ first_name, last_name }, index) => {
                                     return (
                                         <Table.Row key={index}>
                                             <Table.Cell singleLine>
-                                                {member.first_name}
+                                                {first_name} {last_name}
                                             </Table.Cell>
                                         </Table.Row>
                                     );
