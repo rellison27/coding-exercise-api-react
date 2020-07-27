@@ -121,6 +121,7 @@ class PeopleController extends Controller
     {
         // Validate fields
         $validator = Validator::make($request->all(), [
+            '*.id' => 'integer|min:1',
             '*.first_name' => 'required|max:255',
             '*.last_name' => 'required|max:255',
             '*.email_address' => 'required|email',
@@ -129,8 +130,8 @@ class PeopleController extends Controller
         // on fail return error message
         if ($validator->fails()) {
             return response()->json([
-                'errors' => $validator->errors(),
-                'message' => 'all fields are required, please make sure all fields have the correct values',
+                'errors' => $validator->errors()->all(),
+                'message' => 'all fields are required, please make sure all fields have the correct values. (id must be positive integer)',
             ], 422);
         };
         $rows = $request->all();

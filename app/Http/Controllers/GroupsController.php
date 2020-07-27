@@ -107,13 +107,14 @@ class GroupsController extends Controller
     public function handleImportGroups(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            '*.id' => 'integer|min:1',
             '*.group_name' => 'required|max:255',
         ]);
         // on fail return error message
         if ($validator->fails()) {
             return response()->json([
-                'errors' => $validator->errors(),
-                'message' => 'Name of group is required',
+                'errors' => $validator->errors()->all(),
+                'message' => 'Name of group is required, id must be an integer, and Json must be array',
             ], 422);
         };
         $rows = $request->all();
