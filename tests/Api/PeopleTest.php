@@ -133,15 +133,14 @@ class PeopleControllerTest extends TestCase
 
     public function testPersonImportedWithIdCreatesNewUserIfNotFoundInDatabase()
     {
-        $response = $this->json('POST', '/api/import/people/',
-            [[
-                "id" => $this->faker->randomDigit,
-                "first_name" => $this->faker->firstName(),
-                "last_name" => $this->faker->lastName,
-                "email_address" => $this->faker->email,
-                "status" => "active"],
-
-            ]);
-        $response->assertStatus(200);
+        $expected = [
+            "id" => 1,
+            "first_name" => "Doug",
+            "last_name" => "Gentleman",
+            "email_address" => "gentleman@gentleman.com",
+            "status" => "active",
+        ];
+        $response = $this->json('POST', '/api/import/people/', [$expected]);
+        $response->assertStatus(200)->assertJsonFragment($expected);
     }
 }
