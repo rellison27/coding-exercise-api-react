@@ -52,7 +52,7 @@ class GroupsControllerTest extends TestCase
         $group = factory('App\Models\Group')->create();
         Group::destroy($group->id);
 
-        $response = $this->json('GET', '/api/group/' . $group->id);
+        $response = $this->json('GET', '/api/groups/' . $group->id);
         $response->assertStatus(404);
     }
 
@@ -81,4 +81,29 @@ class GroupsControllerTest extends TestCase
         $response->assertStatus(404);
 
     }
+
+    public function testGroupImportUpdatesUserInDatabaseWithSameId()
+    {
+        $group = factory('App\Models\Group')->create();
+
+        $importedGroup = $this->faker->name;
+        $response = $this->json('POST', '/api/import/groups',
+            [[
+                "id" => $group->id,
+                "group_name" => $importedGroup,
+            ],
+            ]);
+        $response->assertStatus(200);
+
+        $updatedGroup = Group::find($group->id);
+        $this->assertEquals($importedGroup, $updatedGroup->group_name);
+    }
+
+    public function testPersonImportedWithIdCreatesNewUserIfNotFoundInDatabase()
+    {
+        $expected = ["id" => 1, "group_name" => "Pastors"];
+        $response = $this->json('POST', '/api/import/groups', [$expected]);
+        $response->assertStatus(200)->assertJsonFragment($expected);
+    }
+
 }
