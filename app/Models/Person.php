@@ -16,6 +16,6 @@ class Person extends Model
     ];
 
     protected $attributes = [
-        'group_name' => 'Member',
+        'group_name' => 'Members',
     ];
 }

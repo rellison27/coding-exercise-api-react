@@ -2,10 +2,9 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Models\Person;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class PeopleControllerTest extends TestCase
 {
@@ -17,7 +16,7 @@ class PeopleControllerTest extends TestCase
             'first_name' => 'Sally',
             'last_name' => 'Ride',
             'email_address' => 'sallyride@nasa.gov',
-            'status' => 'archived'
+            'status' => 'archived',
         ];
         $response = $this->json('POST', '/api/people', $expected);
         $response
@@ -40,8 +39,8 @@ class PeopleControllerTest extends TestCase
                     'email_address',
                     'status',
                     'created_at',
-                    'updated_at'
-                ]
+                    'updated_at',
+                ],
             ]);
     }
 
@@ -70,7 +69,7 @@ class PeopleControllerTest extends TestCase
 
         $updatedFirstName = $this->faker->firstName();
         $response = $this->json('PUT', '/api/people/' . $person->id, [
-            'first_name' => $updatedFirstName
+            'first_name' => $updatedFirstName,
         ]);
         $response->assertStatus(204);
 
@@ -88,5 +87,61 @@ class PeopleControllerTest extends TestCase
         $response = $this->json('GET', '/api/people/' . $person->id);
         $response->assertStatus(404);
 
+    }
+
+    public function testPersonImportFailsWithNoName()
+    {
+        $expected = [
+            'email_address' => 'sallyride@nasa.gov',
+            'status' => 'archived',
+        ];
+        $response = $this->json('POST', '/api/import/people', $expected);
+        $response
+            ->assertStatus(422);
+    }
+    public function testPersonImportFailsWithNoEmail()
+    {
+        $expected = [
+            'first_name' => 'Sally',
+            'last_name' => 'Ride',
+            'status' => 'archived',
+        ];
+        $response = $this->json('POST', '/api/import/people', $expected);
+        $response
+            ->assertStatus(422);
+    }
+
+    public function testPersonImportUpdatesUserInDatabaseWithSameId()
+    {
+        $person = factory('App\Models\Person')->create();
+
+        $importedPerson = $this->faker->lastName;
+        $response = $this->json('POST', '/api/import/people/',
+            [[
+                "id" => $person->id,
+                "first_name" => $person->first_name,
+                "last_name" => $importedPerson,
+                "email_address" => $person->email_address,
+                "status" => $person->status],
+
+            ]);
+        $response->assertStatus(200);
+
+        $updatedPerson = Person::find($person->id);
+        $this->assertEquals($importedPerson, $updatedPerson->last_name);
+    }
+
+    public function testPersonImportedWithIdCreatesNewUserIfNotFoundInDatabase()
+    {
+        $response = $this->json('POST', '/api/import/people/',
+            [[
+                "id" => $this->faker->randomDigit,
+                "first_name" => $this->faker->firstName(),
+                "last_name" => $this->faker->lastName,
+                "email_address" => $this->faker->email,
+                "status" => "active"],
+
+            ]);
+        $response->assertStatus(200);
     }
 }
