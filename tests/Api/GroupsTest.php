@@ -99,11 +99,20 @@ class GroupsControllerTest extends TestCase
         $this->assertEquals($importedGroup, $updatedGroup->group_name);
     }
 
-    public function testPersonImportedWithIdCreatesNewUserIfNotFoundInDatabase()
+    public function testGroupImportedWithIdCreatesNewGroupIfNotFoundInDatabase()
     {
         $expected = ["id" => 1, "group_name" => "Pastors"];
         $response = $this->json('POST', '/api/import/groups', [$expected]);
         $response->assertStatus(200)->assertJsonFragment($expected);
+    }
+
+    public function testGroupImportedWithIdAndColumnsArrangedWrong()
+    {
+        $group = factory('App\Models\Group')->create();
+        $expected = $this->faker->name;
+        $response = $this->json('POST', '/api/import/groups', [["group_name" => $expected, "id" => $group->id]]);
+        $updatedGroup = Group::find($group->id);
+        $this->assertEquals($expected, $updatedGroup->group_name);
     }
 
 }

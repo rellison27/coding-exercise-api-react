@@ -113,15 +113,17 @@ class GroupsController extends Controller
         // on fail return error message
         if ($validator->fails()) {
             return response()->json([
-                'errors' => $validator->errors()->all(),
-                'message' => 'Name of group is required, id must be an integer, and Json must be array',
+                'message' => $validator->errors()->all(),
             ], 422);
         };
         $rows = $request->all();
         foreach ($rows as $row) {
             if (array_key_exists('id', $row) && Group::find($row['id']) !== null) {
                 $group = Group::findOrFail($row['id']);
-                $group->update($row);
+                $group->update([
+                    'id' => $row['id'],
+                    'group_name' => $row['group_name'],
+                ]);
             } else {
                 $group = Group::create($row);
                 new GroupResource($group);
