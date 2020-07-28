@@ -130,8 +130,7 @@ class PeopleController extends Controller
         // on fail return error message
         if ($validator->fails()) {
             return response()->json([
-                'errors' => $validator->errors()->all(),
-                'message' => 'all fields are required, please make sure all fields have the correct values. (id must be positive integer)',
+                'message' => $validator->errors()->all(),
             ], 422);
         };
         $rows = $request->all();

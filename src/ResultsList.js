@@ -99,6 +99,27 @@ class ResultsList extends Component {
         }
     };
 
+    postPeople = async (data) => {
+        try {
+            const response = await fetch(
+                "http://localhost:8000/api/import/people",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                }
+            );
+            const postData = await response.json();
+            response.ok
+                ? this.setState({ peopleData: postData.data, errors: [] })
+                : this.setState({ errors: postData.message });
+        } catch (e) {
+            return e;
+        }
+    };
+
     componentDidMount() {
         this.loadPeople();
         this.loadGroups();
@@ -115,21 +136,9 @@ class ResultsList extends Component {
     }
 
     render() {
-        const postPeople = (data) => {
-            fetch("http://localhost:8000/api/import/people", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            })
-                .then((res) => res.json())
-                .then((data) => this.setState({ peopleData: data.data }))
-                .catch((err) => console.error(err));
-        };
         const handleUpload = (data, fileInfo) => {
             Object.keys(data[0]).find((element) => element === "first_name")
-                ? postPeople(data)
+                ? this.postPeople(data)
                 : this.postGroups(data);
         };
         const papaparseOptions = {
@@ -147,9 +156,7 @@ class ResultsList extends Component {
             members,
             errors,
         } = this.state;
-        // Step 3
-        // Update the ReactJS application to
-        // receive an uploaded People & Group CSV file
+
         return (
             <>
                 <div>Upload a .CSV file for your Groups and/or People</div>
