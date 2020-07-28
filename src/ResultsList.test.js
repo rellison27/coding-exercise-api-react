@@ -2,7 +2,7 @@ import React from "react";
 import { mount } from "enzyme";
 import ResultsList from "./ResultsList";
 
-let wrapper, data, people, groups;
+let wrapper, data, people, groups, members;
 
 describe("<ResultsList />", () => {
     beforeAll(() => {
@@ -90,6 +90,10 @@ describe("<ResultsList />", () => {
         expect(
             wrapper.find("TableBody TableRow TableCell").at(4).find("td").text()
         ).toContain("Elders");
+        wrapper.find("Table TableHeaderCell").at(4).simulate("click");
+        expect(
+            wrapper.find("TableBody TableRow TableCell").at(4).find("td").text()
+        ).toContain("Pastors");
     });
 });
 
@@ -119,9 +123,39 @@ describe("<ResultsList /> with groups", () => {
             },
         ];
 
+        members = [
+            [
+                {
+                    id: 132,
+                    first_name: "Macie",
+                    last_name: "Emmerich",
+                    email_address: "cremin.marjory@hotmail.com",
+                    status: "active",
+                    group_name: "Elders",
+                    updated_at: "2019-07-20 22:05:47",
+                    created_at: "2019-07-20 22:05:47",
+                },
+                {
+                    id: 132,
+                    first_name: "Ellis",
+                    last_name: "Ferich",
+                    email_address: "bremin.marjory@hotmail.com",
+                    status: "active",
+                    group_name: "Elders",
+                    updated_at: "2019-07-20 22:05:47",
+                    created_at: "2019-07-20 22:05:47",
+                },
+            ],
+            [],
+        ];
+
         groups = [{ group_name: "Elders" }, { group_name: "Members" }];
 
-        wrapper.setState({ peopleData: people, groupData: groups });
+        wrapper.setState({
+            peopleData: people,
+            groupData: groups,
+            members: members,
+        });
     });
 
     test("Two Group Tables should be present", () => {
@@ -133,9 +167,54 @@ describe("<ResultsList /> with groups", () => {
             wrapper.find("Table").at(1).find("TableHeaderCell").text()
         ).toContain("Elders");
     });
+
     test("Second Table should be Members", () => {
         expect(
             wrapper.find("Table").at(2).find("TableHeaderCell").text()
         ).toContain("Members");
+    });
+
+    test("Elders group table should have two people in the table", () => {
+        expect(wrapper.find("Table").at(1).find("TableBody").text()).toContain(
+            "Macie EmmerichEllis Ferich"
+        );
+    });
+
+    test("Elders group table should sort by first_name", () => {
+        expect(
+            wrapper
+                .find("Table")
+                .at(1)
+                .find("TableBody TableRow TableCell")
+                .at(0)
+                .find("td")
+                .text()
+        ).toContain("Macie");
+        wrapper.find("Table").at(1).find("TableHeaderCell").simulate("click");
+
+        expect(
+            wrapper
+                .find("Table")
+                .at(1)
+                .find("TableBody TableRow TableCell")
+                .at(0)
+                .find("td")
+                .text()
+        ).toContain("Ellis");
+
+        // Making sure the people data table hasn't changed
+        expect(
+            wrapper.find("TableBody TableRow TableCell").at(0).find("td").text()
+        ).toContain("Macie");
+        wrapper.find("Table").at(1).find("TableHeaderCell").simulate("click");
+        expect(
+            wrapper
+                .find("Table")
+                .at(1)
+                .find("TableBody TableRow TableCell")
+                .at(0)
+                .find("td")
+                .text()
+        ).toContain("Macie");
     });
 });
