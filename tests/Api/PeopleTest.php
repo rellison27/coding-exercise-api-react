@@ -143,4 +143,21 @@ class PeopleControllerTest extends TestCase
         $response = $this->json('POST', '/api/import/people/', [$expected]);
         $response->assertStatus(200)->assertJsonFragment($expected);
     }
+
+    public function testPersonImportedWithIdAndColumnsArrangedWrong()
+    {
+        $person = factory('App\Models\Person')->create();
+        $expected = $this->faker->firstName;
+        $response = $this->json('POST', '/api/import/people', [
+            [
+                "email_address" => $person->email_address,
+                "first_name" => $expected,
+                "last_name" => $person->last_name,
+                "id" => $person->id,
+            ],
+        ]
+        );
+        $updatedGroup = Person::find($person->id);
+        $this->assertEquals($expected, $updatedGroup->first_name);
+    }
 }

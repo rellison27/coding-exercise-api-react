@@ -138,7 +138,11 @@ class PeopleController extends Controller
         foreach ($rows as $row) {
             if (array_key_exists('id', $row) && Person::find($row['id']) !== null) {
                 $person = Person::findOrFail($row['id']);
-                $person->update($row);
+                $id = $row['id'];
+                unset($row['id']);
+                $id_array = array('id' => $id);
+                $updatePerson = $id_array + $row;
+                $person->update($updatePerson);
             } else {
                 $person = Person::create($row);
                 new PersonResource($person);
