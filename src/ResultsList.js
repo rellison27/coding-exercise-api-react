@@ -1,42 +1,17 @@
 import React, { Component } from "react";
-import { Table } from "semantic-ui-react";
+import { Table, Message } from "semantic-ui-react";
 import CSVReader from "react-csv-reader";
 import _ from "lodash";
 class ResultsList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            peopleData: [
-                {
-                    first_name: "Vaughn",
-                    last_name: "Hellison",
-                    status: "active",
-                    group_name: "Member",
-                },
-                {
-                    first_name: "John",
-                    last_name: "Dellison",
-                    status: "active",
-                    group_name: "Elder",
-                },
-                {
-                    first_name: "Shaun",
-                    last_name: "Ellison",
-                    status: "active",
-                    group_name: "Member",
-                },
-
-                {
-                    first_name: "Gon",
-                    last_name: "Gellison",
-                    status: "active",
-                    group_name: "Elder",
-                },
-            ],
-            groupData: [{ group_name: "Member" }, { group_name: "Elder" }],
+            peopleData: [],
+            groupData: [],
             column: null,
             direction: null,
             members: [],
+            errors: [],
         };
     }
     handleSort = (clickedColumn) => () => {
@@ -80,6 +55,17 @@ class ResultsList extends Component {
         return;
     };
 
+    loadPeople = () => {
+        fetch("http://localhost:8000/api/people")
+            .then((response) => response.json())
+            .then((data) => this.setState({ peopleData: data.data }));
+    };
+
+    loadGroups = () => {
+        fetch("http://localhost:8000/api/groups")
+            .then((response) => response.json())
+            .then((data) => this.setState({ groupData: data.data }));
+    };
     createMembersArr = () => {
         const { peopleData, groupData } = this.state;
         this.setState({
@@ -92,13 +78,30 @@ class ResultsList extends Component {
         });
     };
 
+    postGroups = async (data) => {
+        try {
+            const response = await fetch(
+                "http://localhost:8000/api/import/groups",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                }
+            );
+            const postData = await response.json();
+            response.ok
+                ? this.setState({ groupData: postData.data, errors: [] })
+                : this.setState({ errors: postData.message });
+        } catch (e) {
+            return e;
+        }
+    };
+
     componentDidMount() {
-        fetch("http://localhost:8000/api/people")
-            .then((response) => response.json())
-            .then((data) => this.setState({ peopleData: data.data }));
-        fetch("http://localhost:8000/api/groups")
-            .then((response) => response.json())
-            .then((data) => this.setState({ groupData: data.data }));
+        this.loadPeople();
+        this.loadGroups();
         this.createMembersArr();
     }
 
@@ -112,32 +115,22 @@ class ResultsList extends Component {
     }
 
     render() {
-        const postGroups = (data) => {
-            const { groupData } = this.state;
-            this.setState({ groupData: [...groupData, ...data] });
-            fetch("http://localhost:8000/api/import/groups", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
-        };
         const postPeople = (data) => {
-            const { peopleData } = this.state;
-            this.setState({ peopleData: [...peopleData, ...data] });
             fetch("http://localhost:8000/api/import/people", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(data),
-            });
+            })
+                .then((res) => res.json())
+                .then((data) => this.setState({ peopleData: data.data }))
+                .catch((err) => console.error(err));
         };
         const handleUpload = (data, fileInfo) => {
             Object.keys(data[0]).find((element) => element === "first_name")
                 ? postPeople(data)
-                : postGroups(data);
+                : this.postGroups(data);
         };
         const papaparseOptions = {
             header: true,
@@ -152,6 +145,7 @@ class ResultsList extends Component {
             groupData,
             peopleData,
             members,
+            errors,
         } = this.state;
         // Step 3
         // Update the ReactJS application to
@@ -159,6 +153,13 @@ class ResultsList extends Component {
         return (
             <>
                 <div>Upload a .CSV file for your Groups and/or People</div>
+                {Boolean(errors.length) && (
+                    <Message
+                        negative
+                        header="It looks like there are some problems with the data you uploaded."
+                        list={errors}
+                    />
+                )}
                 <CSVReader
                     cssClass="react-csv-input"
                     onFileLoaded={handleUpload}
@@ -193,7 +194,7 @@ class ResultsList extends Component {
                                 }
                                 onClick={this.handleSort("email_address")}
                             >
-                                Email
+                                Email Address
                             </Table.HeaderCell>
                             <Table.HeaderCell
                                 sorted={column === "status" ? direction : null}
@@ -207,7 +208,7 @@ class ResultsList extends Component {
                                 }
                                 onClick={this.handleSort("group_name")}
                             >
-                                Group
+                                Group Name (Optional)
                             </Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
