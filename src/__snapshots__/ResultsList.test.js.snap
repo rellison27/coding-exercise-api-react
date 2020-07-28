@@ -1,74 +1,289 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<ResultsList /> should match the snapshot 1`] = `
-<Table
-  as="table"
-  celled={true}
-  padded={true}
->
-  <TableHeader
-    as="thead"
+exports[`<ResultsList /> renders 1`] = `
+<ResultsList>
+  <div>
+    Upload a .CSV file for your Groups and/or People
+  </div>
+  <a
+    cssClass="react-csv-input"
+    onFileLoaded={[Function]}
+    parserOptions={
+      Object {
+        "dynamicTyping": true,
+        "header": true,
+        "skipEmptyLines": true,
+        "transformHeader": [Function],
+      }
+    }
   >
-    <TableRow
-      as="tr"
-      cellAs="td"
+    <div
+      className="react-csv-input"
     >
-      <TableHeaderCell
-        as="th"
-        singleLine={true}
-      >
-        First Name
-      </TableHeaderCell>
-      <TableHeaderCell
-        as="th"
-      >
-        Last Name
-      </TableHeaderCell>
-      <TableHeaderCell
-        as="th"
-      >
-        Email
-      </TableHeaderCell>
-      <TableHeaderCell
-        as="th"
-      >
-        Status
-      </TableHeaderCell>
-    </TableRow>
-  </TableHeader>
-  <TableBody
-    as="tbody"
+      <input
+        accept=".csv, text/csv"
+        className="csv-input"
+        disabled={false}
+        id="react-csv-reader-input"
+        onChange={[Function]}
+        style={Object {}}
+        type="file"
+      />
+    </div>
+  </a>
+  <h1>
+     People
+  </h1>
+  <Table
+    as="table"
+    celled={true}
+    padded={true}
+    sortable={true}
   >
-    <TableRow
-      as="tr"
-      cellAs="td"
-      key="0"
+    <table
+      className="ui celled sortable padded table"
     >
-      <TableCell
-        as="td"
-        singleLine={true}
+      <TableHeader
+        as="thead"
       >
-        Macie
-      </TableCell>
-      <TableCell
-        as="td"
-        singleLine={true}
+        <thead
+          className=""
+        >
+          <TableRow
+            as="tr"
+            cellAs="td"
+          >
+            <tr
+              className=""
+            >
+              <TableHeaderCell
+                as="th"
+                onClick={[Function]}
+                singleLine={true}
+                sorted={null}
+              >
+                <TableCell
+                  as="th"
+                  className=""
+                  onClick={[Function]}
+                  singleLine={true}
+                >
+                  <th
+                    className="single line"
+                    onClick={[Function]}
+                  >
+                    First Name
+                  </th>
+                </TableCell>
+              </TableHeaderCell>
+              <TableHeaderCell
+                as="th"
+                onClick={[Function]}
+                sorted={null}
+              >
+                <TableCell
+                  as="th"
+                  className=""
+                  onClick={[Function]}
+                >
+                  <th
+                    className=""
+                    onClick={[Function]}
+                  >
+                    Last Name
+                  </th>
+                </TableCell>
+              </TableHeaderCell>
+              <TableHeaderCell
+                as="th"
+                onClick={[Function]}
+                sorted={null}
+              >
+                <TableCell
+                  as="th"
+                  className=""
+                  onClick={[Function]}
+                >
+                  <th
+                    className=""
+                    onClick={[Function]}
+                  >
+                    Email Address
+                  </th>
+                </TableCell>
+              </TableHeaderCell>
+              <TableHeaderCell
+                as="th"
+                onClick={[Function]}
+                sorted={null}
+              >
+                <TableCell
+                  as="th"
+                  className=""
+                  onClick={[Function]}
+                >
+                  <th
+                    className=""
+                    onClick={[Function]}
+                  >
+                    Status
+                  </th>
+                </TableCell>
+              </TableHeaderCell>
+              <TableHeaderCell
+                as="th"
+                onClick={[Function]}
+                sorted={null}
+              >
+                <TableCell
+                  as="th"
+                  className=""
+                  onClick={[Function]}
+                >
+                  <th
+                    className=""
+                    onClick={[Function]}
+                  >
+                    Group Name (Optional)
+                  </th>
+                </TableCell>
+              </TableHeaderCell>
+            </tr>
+          </TableRow>
+        </thead>
+      </TableHeader>
+      <TableBody
+        as="tbody"
       >
-        Emmerich
-      </TableCell>
-      <TableCell
-        as="td"
-        singleLine={true}
-      >
-        cremin.marjory@hotmail.com
-      </TableCell>
-      <TableCell
-        as="td"
-        singleLine={true}
-      >
-        active
-      </TableCell>
-    </TableRow>
-  </TableBody>
-</Table>
+        <tbody
+          className=""
+        >
+          <TableRow
+            as="tr"
+            cellAs="td"
+            key="0"
+          >
+            <tr
+              className=""
+            >
+              <TableCell
+                as="td"
+                singleLine={true}
+              >
+                <td
+                  className="single line"
+                >
+                  Macie
+                </td>
+              </TableCell>
+              <TableCell
+                as="td"
+                singleLine={true}
+              >
+                <td
+                  className="single line"
+                >
+                  Emmerich
+                </td>
+              </TableCell>
+              <TableCell
+                as="td"
+                singleLine={true}
+              >
+                <td
+                  className="single line"
+                >
+                  cremin.marjory@hotmail.com
+                </td>
+              </TableCell>
+              <TableCell
+                as="td"
+                singleLine={true}
+              >
+                <td
+                  className="single line"
+                >
+                  active
+                </td>
+              </TableCell>
+              <TableCell
+                as="td"
+                singleLine={true}
+              >
+                <td
+                  className="single line"
+                >
+                  Pastors
+                </td>
+              </TableCell>
+            </tr>
+          </TableRow>
+          <TableRow
+            as="tr"
+            cellAs="td"
+            key="1"
+          >
+            <tr
+              className=""
+            >
+              <TableCell
+                as="td"
+                singleLine={true}
+              >
+                <td
+                  className="single line"
+                >
+                  Ellis
+                </td>
+              </TableCell>
+              <TableCell
+                as="td"
+                singleLine={true}
+              >
+                <td
+                  className="single line"
+                >
+                  Ferich
+                </td>
+              </TableCell>
+              <TableCell
+                as="td"
+                singleLine={true}
+              >
+                <td
+                  className="single line"
+                >
+                  bremin.marjory@hotmail.com
+                </td>
+              </TableCell>
+              <TableCell
+                as="td"
+                singleLine={true}
+              >
+                <td
+                  className="single line"
+                >
+                  archived
+                </td>
+              </TableCell>
+              <TableCell
+                as="td"
+                singleLine={true}
+              >
+                <td
+                  className="single line"
+                >
+                  Elders
+                </td>
+              </TableCell>
+            </tr>
+          </TableRow>
+        </tbody>
+      </TableBody>
+    </table>
+  </Table>
+  <h1>
+    Groups
+  </h1>
+</ResultsList>
 `;
