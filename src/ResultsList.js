@@ -12,6 +12,7 @@ class ResultsList extends Component {
             direction: null,
             members: [],
             errors: [],
+            success: "",
         };
     }
     handleSort = (clickedColumn) => () => {
@@ -91,9 +92,12 @@ class ResultsList extends Component {
                 }
             );
             const postData = await response.json();
-            response.ok
-                ? this.setState({ groupData: postData.data, errors: [] })
-                : this.setState({ errors: postData.message });
+            if (response.ok) {
+                this.loadGroups();
+                this.setState({ errors: [], success: postData.message });
+            } else {
+                this.setState({ errors: postData.message, success: "" });
+            }
         } catch (e) {
             return e;
         }
@@ -112,9 +116,12 @@ class ResultsList extends Component {
                 }
             );
             const postData = await response.json();
-            response.ok
-                ? this.setState({ peopleData: postData.data, errors: [] })
-                : this.setState({ errors: postData.message });
+            if (response.ok) {
+                this.loadPeople();
+                this.setState({ errors: [], success: postData.message });
+            } else {
+                this.setState({ errors: postData.message, success: "" });
+            }
         } catch (e) {
             return e;
         }
@@ -141,6 +148,7 @@ class ResultsList extends Component {
                 ? this.postPeople(data)
                 : this.postGroups(data);
         };
+        const handleDismiss = () => this.setState({ success: "" });
         const papaparseOptions = {
             header: true,
             dynamicTyping: true,
@@ -155,6 +163,7 @@ class ResultsList extends Component {
             peopleData,
             members,
             errors,
+            success,
         } = this.state;
 
         return (
@@ -167,12 +176,24 @@ class ResultsList extends Component {
                         list={errors}
                     />
                 )}
+                {success && (
+                    <Message positive onDismiss={handleDismiss}>
+                        <Message.Header>
+                            Everything looks great! Great Job.
+                        </Message.Header>
+                        <p>{success}</p>
+                    </Message>
+                )}
                 <CSVReader
                     cssClass="react-csv-input"
                     onFileLoaded={handleUpload}
                     parserOptions={papaparseOptions}
                 />
                 <h1> People</h1>
+                <p>
+                    If you don't specify the person's Group Name in your .csv we
+                    will default them to the 'Members' group
+                </p>
                 <Table celled padded sortable>
                     <Table.Header>
                         <Table.Row>
