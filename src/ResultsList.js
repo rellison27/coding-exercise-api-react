@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Table, Message } from "semantic-ui-react";
+import { Table, Message, Loader, Dimmer } from "semantic-ui-react";
 import CSVReader from "react-csv-reader";
 import _ from "lodash";
 class ResultsList extends Component {
@@ -13,6 +13,7 @@ class ResultsList extends Component {
             members: [],
             errors: [],
             success: "",
+            Loading: false,
         };
     }
     handleSort = (clickedColumn) => () => {
@@ -59,13 +60,17 @@ class ResultsList extends Component {
     loadPeople = () => {
         fetch("http://localhost:8000/api/people")
             .then((response) => response.json())
-            .then((data) => this.setState({ peopleData: data.data }));
+            .then((data) =>
+                this.setState({ peopleData: data.data, Loading: false })
+            );
     };
 
     loadGroups = () => {
         fetch("http://localhost:8000/api/groups")
             .then((response) => response.json())
-            .then((data) => this.setState({ groupData: data.data }));
+            .then((data) =>
+                this.setState({ groupData: data.data, Loading: false })
+            );
     };
     createMembersArr = () => {
         const { peopleData, groupData } = this.state;
@@ -81,6 +86,7 @@ class ResultsList extends Component {
 
     postGroups = async (data) => {
         try {
+            this.setState({ Loading: true });
             const response = await fetch(
                 "http://localhost:8000/api/import/groups",
                 {
@@ -94,9 +100,17 @@ class ResultsList extends Component {
             const postData = await response.json();
             if (response.ok) {
                 this.loadGroups();
-                this.setState({ errors: [], success: postData.message });
+                this.setState({
+                    errors: [],
+                    success: postData.message,
+                    Loading: false,
+                });
             } else {
-                this.setState({ errors: postData.message, success: "" });
+                this.setState({
+                    errors: postData.message,
+                    success: "",
+                    Loading: false,
+                });
             }
         } catch (e) {
             return e;
@@ -105,6 +119,7 @@ class ResultsList extends Component {
 
     postPeople = async (data) => {
         try {
+            this.setState({ Loading: true });
             const response = await fetch(
                 "http://localhost:8000/api/import/people",
                 {
@@ -118,9 +133,17 @@ class ResultsList extends Component {
             const postData = await response.json();
             if (response.ok) {
                 this.loadPeople();
-                this.setState({ errors: [], success: postData.message });
+                this.setState({
+                    errors: [],
+                    success: postData.message,
+                    Loading: false,
+                });
             } else {
-                this.setState({ errors: postData.message, success: "" });
+                this.setState({
+                    errors: postData.message,
+                    success: "",
+                    Loading: false,
+                });
             }
         } catch (e) {
             return e;
@@ -128,6 +151,7 @@ class ResultsList extends Component {
     };
 
     componentDidMount() {
+        this.setState({ Loading: true });
         this.loadPeople();
         this.loadGroups();
         this.createMembersArr();
@@ -164,10 +188,18 @@ class ResultsList extends Component {
             members,
             errors,
             success,
+            Loading,
         } = this.state;
 
         return (
             <>
+                {Loading && (
+                    <Dimmer active>
+                        <Loader size="huge" inline="centered">
+                            Loading
+                        </Loader>
+                    </Dimmer>
+                )}
                 <div>Upload a .CSV file for your Groups and/or People</div>
                 {Boolean(errors.length) && (
                     <Message
