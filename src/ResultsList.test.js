@@ -217,4 +217,20 @@ describe("<ResultsList /> with groups", () => {
                 .text()
         ).toContain("Macie");
     });
+
+    // Please ignore my experiemnting I want to come back to this later
+    test("Trying to test upload functionality in this environment", () => {
+        const postGroups = jest.fn((url) => [
+            { group_name: "Pastors" },
+            { group_name: "Elders" },
+        ]);
+        const postPeople = jest.fn((url) => [
+            { first_name: "Pastors" },
+            { first_name: "Elders" },
+        ]);
+        wrapper.find("a").props().onFileLoaded(postGroups());
+        wrapper.find("a").props().onFileLoaded(postPeople());
+        expect(postGroups).toHaveBeenCalled();
+        expect(postPeople).toHaveBeenCalled();
+    });
 });
